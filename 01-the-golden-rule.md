@@ -61,7 +61,7 @@ public class Player
 
 ```mermaid
 graph TD
-    subgraph "Heap Memory (Scattered)"
+    subgraph Heap_Memory_Scattered
         A[Player Instance 1<br/>0x1000] -->|vtable ptr| V1[VTable<br/>0x5000]
         A -->|Health: 100| AH[Health Data<br/>0x1004]
         A -->|Speed: 5.5f| AS[Speed Data<br/>0x1008]
@@ -75,8 +75,8 @@ graph TD
         C -->|Speed: 4.8f| CS[Speed Data<br/>0x7008]
     end
     
-    subgraph "CPU Cache Line (64 bytes)"
-        CL[Cache fetches Player 1...<br/>then Player 2 is 0x2000 bytes away!]
+    subgraph CPU_Cache_Line_64_bytes
+        CL[Cache fetches Player 1<br/>then Player 2 is 0x2000 bytes away]
     end
     
     style A fill:#ff6b6b
@@ -385,7 +385,12 @@ public static void Heal(ref Health health) { }
 public static void Heal(ref int current, int max, int amount) { }
 ```
 
-#### 2. Early Exit Pattern (See Chapter 2)
+**Why primitives matter:** See [Chapter 4: Burst Compatibility](./04-burst-compatibility.md#why-primitives-only) for deep dive on Burst optimization.
+
+#### 2. Early Exit Pattern
+
+**See [Chapter 2: Early Exit Pattern](./02-early-exit-pattern.md)** for complete guide to guard clauses and validation.
+
 ```csharp
 public static bool TryApplyDamage(ref int current, int damage)
 {
@@ -398,10 +403,10 @@ public static bool TryApplyDamage(ref int current, int damage)
 ```
 
 #### 3. Aggressive Inlining
-```csharp
-[MethodImpl(MethodImplOptions.AggressiveInlining)]
-```
-This hint tells the JIT/Burst compiler to inline the method body at the call site, eliminating function call overhead.
+
+All hot-path logic methods should use `[MethodImpl(MethodImplOptions.AggressiveInlining)]` to eliminate function call overhead.
+
+**For detailed inlining explanation, costs, and when to apply it, see [Chapter 4: Burst Compatibility](./04-burst-compatibility.md#method-inlining)**
 
 ---
 
@@ -725,13 +730,13 @@ Sequential data layout improves cache hit rates:
 
 ```mermaid
 graph TD
-    subgraph "CPU L1 Cache (64-byte cache lines)"
+    subgraph CPU_L1_Cache
         CL1["Cache Line 1<br/>Cooldown 0-7"]
         CL2["Cache Line 2<br/>Cooldown 8-15"]
         CL3["Cache Line 3<br/>Cooldown 16-23"]
     end
     
-    subgraph "RAM (NativeArray of Cooldown)"
+    subgraph RAM_NativeArray
         direction LR
         C0["C0<br/>8 bytes"] --> C1["C1"]
         C1 --> C2["C2"]
@@ -747,15 +752,15 @@ graph TD
     C0 -.->|Single fetch loads 8 structs| CL1
     C8 -.->|Next fetch| CL2
     
-    CPU["CPU Core"] -->|Reads C0| CL1
-    CPU -->|C1 already cached| CL1
-    CPU -->|C2 already cached| CL1
-    CPU -->|C7 already cached| CL1
+    CPUCORE["CPU Core"] -->|Reads C0| CL1
+    CPUCORE -->|C1 already cached| CL1
+    CPUCORE -->|C2 already cached| CL1
+    CPUCORE -->|C7 already cached| CL1
     
     style CL1 fill:#1dd1a1
     style CL2 fill:#1dd1a1
     style CL3 fill:#1dd1a1
-    style CPU fill:#48dbfb
+    style CPUCORE fill:#48dbfb
 ```
 
 **Memory Layout Details:**

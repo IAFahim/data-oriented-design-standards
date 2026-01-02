@@ -237,6 +237,8 @@ public static bool TryGetValue(out int value)
 }
 ```
 
+**For complete guide to the TryX Pattern, see [Chapter 3: TryX Pattern](./03-tryx-pattern.md)**
+
 ---
 
 ## Cyclomatic Complexity Explained
@@ -373,29 +375,36 @@ graph TB
 
 ## Real-World Examples
 
-### Example 1: Damage Processing
+### Example 1: Timer Validation
 
 #### ❌ Before (Nested)
 
 ```csharp
-public static bool TryApplyDamage(ref int current, int damage, bool isInvincible)
+public static bool TryStartTimer(ref float current, float duration, bool canRestart)
 {
-    if (!isInvincible)
+    if (canRestart)
     {
-        if (damage > 0)
+        if (duration > 0)
         {
-            if (current > 0)
+            if (current <= 0)
             {
-                current -= damage;
-                if (current < 0)
-                {
-                    current = 0;
-                }
-                return current > 0;
+                current = duration;
+                return true;
+            }
+            else
+            {
+                return false; // Already running
             }
         }
+        else
+        {
+            return false; // Invalid duration
+        }
     }
-    return true;
+    else
+    {
+        return false; // Cannot restart
+    }
 }
 ```
 
@@ -408,41 +417,40 @@ public static bool TryApplyDamage(ref int current, int damage, bool isInvincible
 
 ```csharp
 [MethodImpl(MethodImplOptions.AggressiveInlining)]
-public static bool TryApplyDamage(ref int current, int damage, bool isInvincible)
+public static bool TryStartTimer(ref float current, float duration, bool canRestart)
 {
     // Guard clauses
-    if (isInvincible) return true;
-    if (damage <= 0) return true;
-    if (current <= 0) return false;
+    if (!canRestart) return false;
+    if (duration <= 0) return false;
+    if (current > 0) return false; // Already running
     
     // Main logic
-    current -= damage;
-    if (current < 0) current = 0;
-    
-    return current > 0;
+    current = duration;
+    return true;
 }
 ```
 
 **Cyclomatic Complexity: 4**  
 **Indentation: 1 level**  
-**Lines saved: 6**
+**Lines saved: 15**
 
 ---
 
-### Example 2: Cooldown Reset
+### Example 2: Resource Pool Allocation
 
 #### ❌ Before
 
 ```csharp
-public static void Reset(ref float current, float max, bool canReset)
+public static void Allocate(ref int allocated, int total, int requested)
 {
-    if (canReset)
+    if (requested > 0)
     {
-        if (max > 0)
+        if (allocated < total)
         {
-            if (current != max)
+            int available = total - allocated;
+            if (requested <= available)
             {
-                current = max;
+                allocated += requested;
             }
         }
     }
@@ -455,13 +463,15 @@ public static void Reset(ref float current, float max, bool canReset)
 
 ```csharp
 [MethodImpl(MethodImplOptions.AggressiveInlining)]
-public static void Reset(ref float current, float max, bool canReset)
+public static void Allocate(ref int allocated, int total, int requested)
 {
-    if (!canReset) return;
-    if (max <= 0) return;
-    if (current == max) return;
+    if (requested <= 0) return;
+    if (allocated >= total) return;
     
-    current = max;
+    int available = total - allocated;
+    if (requested > available) return;
+    
+    allocated += requested;
 }
 ```
 
