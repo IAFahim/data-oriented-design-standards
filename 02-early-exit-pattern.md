@@ -100,7 +100,8 @@ The **Early Exit Pattern** validates inputs at the top of a function and returns
 
 ```mermaid
 graph LR
-    subgraph "❌ Traditional (Nested)"
+    subgraph Traditional_Nested
+        direction TB
         T1[Check condition 1] --> T2{Valid?}
         T2 -->|Yes| T3[Check condition 2]
         T2 -->|No| TE1[Handle error]
@@ -109,7 +110,8 @@ graph LR
         T4 -->|No| TE2[Handle error]
     end
     
-    subgraph "✅ Early Exit (Flat)"
+    subgraph Early_Exit_Flat
+        direction TB
         E1[Check condition 1] --> E2{Valid?}
         E2 -->|No| EE1[return early]
         E2 -->|Yes| E3[Check condition 2]
@@ -260,11 +262,11 @@ Decision points = if, for, while, case, &&, ||, ?:
 
 ```mermaid
 graph LR
-    subgraph "Complexity Scale"
-        C1["1-3<br/>✅ Simple<br/>Low Risk"]
-        C2["4-7<br/>⚠️ Moderate<br/>Medium Risk"]
-        C3["8-10<br/>❌ Complex<br/>High Risk"]
-        C4["11+<br/>🔥 Untestable<br/>Refactor!"]
+    subgraph Complexity_Scale
+        C1["1-3<br/>Simple<br/>Low Risk"]
+        C2["4-7<br/>Moderate<br/>Medium Risk"]
+        C3["8-10<br/>Complex<br/>High Risk"]
+        C4["11+<br/>Untestable<br/>Refactor"]
     end
     
     style C1 fill:#26de81
@@ -315,17 +317,17 @@ public static bool Validate(int a, int b, int c)
 
 ```mermaid
 graph TB
-    subgraph "Nested (CC=7)"
+    subgraph Nested_CC7
         direction TB
-        N1[Start] --> N2{a > 0?}
+        N1[Start] --> N2{a greater 0?}
         N2 -->|No| NF[Return false]
-        N2 -->|Yes| N3{b > 0?}
+        N2 -->|Yes| N3{b greater 0?}
         N3 -->|No| NF
-        N3 -->|Yes| N4{c > 0?}
+        N3 -->|Yes| N4{c greater 0?}
         N4 -->|No| NF
-        N4 -->|Yes| N5{a > b?}
+        N4 -->|Yes| N5{a greater b?}
         N5 -->|No| NF
-        N5 -->|Yes| N6{b > c?}
+        N5 -->|Yes| N6{b greater c?}
         N6 -->|No| NF
         N6 -->|Yes| NT[Return true]
         
@@ -337,17 +339,17 @@ graph TB
         style NF fill:#ee5a6f
     end
     
-    subgraph "Early Exit (CC=6)"
+    subgraph Early_Exit_CC6
         direction TB
-        E1[Start] --> E2{a <= 0?}
+        E1[Start] --> E2{a less equal 0?}
         E2 -->|Yes| EF1[Return false]
-        E2 -->|No| E3{b <= 0?}
+        E2 -->|No| E3{b less equal 0?}
         E3 -->|Yes| EF2[Return false]
-        E3 -->|No| E4{c <= 0?}
+        E3 -->|No| E4{c less equal 0?}
         E4 -->|Yes| EF3[Return false]
-        E4 -->|No| E5{a <= b?}
+        E4 -->|No| E5{a less equal b?}
         E5 -->|Yes| EF4[Return false]
-        E5 -->|No| E6{b <= c?}
+        E5 -->|No| E6{b less equal c?}
         E6 -->|Yes| EF5[Return false]
         E6 -->|No| ET[Return true]
         
@@ -535,12 +537,12 @@ if (invalidCondition) return defaultValue;
 
 ```mermaid
 graph TD
-    subgraph "Guard Clause Types"
-        G1["Null Check<br/>if (value == null) return;"]
-        G2["Range Check<br/>if (value < 0 || value > max) return;"]
-        G3["State Check<br/>if (!isValid) return;"]
-        G4["Divide by Zero<br/>if (divisor == 0) return;"]
-        G5["Empty Collection<br/>if (list.Length == 0) return;"]
+    subgraph Guard_Clause_Types
+        G1["Null Check<br/>if value equals null return"]
+        G2["Range Check<br/>if value less 0 or greater max return"]
+        G3["State Check<br/>if not isValid return"]
+        G4["Divide by Zero<br/>if divisor equals 0 return"]
+        G5["Empty Collection<br/>if list Length equals 0 return"]
     end
     
     style G1 fill:#48dbfb
@@ -580,21 +582,21 @@ Modern CPUs predict branch outcomes. Early exits help the predictor.
 
 ```mermaid
 graph LR
-    subgraph "❌ Nested (Hard to Predict)"
-        N1[if A] --> N2{?}
+    subgraph Nested_Hard_to_Predict
+        N1[if A] --> N2{branch}
         N2 --> N3[if B]
-        N3 --> N4{?}
+        N3 --> N4{branch}
         N4 --> N5[if C]
-        N5 --> N6{?}
+        N5 --> N6{branch}
         
         style N2 fill:#ff6b6b
         style N4 fill:#ff6b6b
         style N6 fill:#ff6b6b
     end
     
-    subgraph "✅ Early Exit (Predictable)"
-        E1[if !A return] --> E2[if !B return]
-        E2 --> E3[if !C return]
+    subgraph Early_Exit_Predictable
+        E1[if not A return] --> E2[if not B return]
+        E2 --> E3[if not C return]
         E3 --> E4[main logic]
         
         style E1 fill:#26de81
@@ -643,7 +645,7 @@ ret
 
 ```mermaid
 graph TB
-    subgraph "Instruction Cache (I-Cache)"
+    subgraph Instruction_Cache
         IC1["Guard 1: 2 bytes"]
         IC2["Guard 2: 2 bytes"]
         IC3["Guard 3: 2 bytes"]
@@ -651,8 +653,8 @@ graph TB
         IC5["Return: 1 byte"]
     end
     
-    subgraph "Cache Line (64 bytes)"
-        CL["Entire function fits in 1 cache line!"]
+    subgraph Cache_Line_64bytes
+        CL["Entire function fits in 1 cache line"]
     end
     
     IC1 --> CL
@@ -834,12 +836,12 @@ graph TD
     START[Start Writing Function] --> Q1{Guard clauses at top?}
     Q1 -->|No| FIX1[Move validation to top]
     Q1 -->|Yes| Q2{Any else blocks?}
-    Q2 -->|Yes| FIX2[Remove else, use early return]
-    Q2 -->|No| Q3{Indentation > 2 levels?}
+    Q2 -->|Yes| FIX2[Remove else use early return]
+    Q2 -->|No| Q3{Indentation greater 2 levels?}
     Q3 -->|Yes| FIX3[Flatten with guard clauses]
-    Q3 -->|No| Q4{Cyclomatic Complexity > 3?}
+    Q3 -->|No| Q4{Cyclomatic Complexity greater 3?}
     Q4 -->|Yes| FIX4[Split into smaller functions]
-    Q4 -->|No| DONE[✅ Good to go!]
+    Q4 -->|No| DONE[Good to go]
     
     FIX1 --> Q1
     FIX2 --> Q2
@@ -854,6 +856,9 @@ graph TD
     style FIX4 fill:#feca57
     style Q1 fill:#48dbfb
     style Q2 fill:#48dbfb
+    style Q3 fill:#48dbfb
+    style Q4 fill:#48dbfb
+```
     style Q3 fill:#48dbfb
     style Q4 fill:#48dbfb
 ```

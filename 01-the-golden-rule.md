@@ -288,10 +288,10 @@ graph TB
 ```mermaid
 graph LR
     subgraph "1000 Health Structs in NativeArray"
-        H1["Health[0]<br/>8 bytes"] --> H2["Health[1]<br/>8 bytes"]
-        H2 --> H3["Health[2]<br/>8 bytes"]
+        H1["Health 0<br/>8 bytes"] --> H2["Health 1<br/>8 bytes"]
+        H2 --> H3["Health 2<br/>8 bytes"]
         H3 --> H4["..."]
-        H4 --> H5["Health[999]<br/>8 bytes"]
+        H4 --> H5["Health 999<br/>8 bytes"]
     end
     
     BURST[Burst Compiler] -.->|memcpy optimization| H1
@@ -627,23 +627,23 @@ for (int i = 0; i < 1000; i++)
 
 ```mermaid
 graph TB
-    subgraph "❌ Non-SIMD (Scalar Processing)"
+    subgraph "Non-SIMD Scalar Processing"
         direction LR
-        S1["Process<br/>cooldown[0]"] --> S2["Process<br/>cooldown[1]"]
-        S2 --> S3["Process<br/>cooldown[2]"]
-        S3 --> S4["Process<br/>cooldown[3]"]
+        S1["Process<br/>cooldown 0"] --> S2["Process<br/>cooldown 1"]
+        S2 --> S3["Process<br/>cooldown 2"]
+        S3 --> S4["Process<br/>cooldown 3"]
         S4 --> S5["..."]
         
         TIME1["Time: 1000 cycles"]
     end
     
-    subgraph "✅ SIMD (Vector Processing)"
+    subgraph "SIMD Vector Processing"
         direction LR
-        V1["Process<br/>cooldown[0-3]<br/>simultaneously"] --> V2["Process<br/>cooldown[4-7]<br/>simultaneously"]
-        V2 --> V3["Process<br/>cooldown[8-11]<br/>simultaneously"]
+        V1["Process<br/>cooldown 0-3<br/>simultaneously"] --> V2["Process<br/>cooldown 4-7<br/>simultaneously"]
+        V2 --> V3["Process<br/>cooldown 8-11<br/>simultaneously"]
         V3 --> V4["..."]
         
-        TIME2["Time: 250 cycles<br/>4x faster!"]
+        TIME2["Time: 250 cycles<br/>4x faster"]
     end
     
     style S1 fill:#ff6b6b
@@ -726,31 +726,31 @@ Sequential data layout improves cache hit rates:
 ```mermaid
 graph TD
     subgraph "CPU L1 Cache (64-byte cache lines)"
-        CL1["Cache Line 1<br/>Cooldown[0-7]"]
-        CL2["Cache Line 2<br/>Cooldown[8-15]"]
-        CL3["Cache Line 3<br/>Cooldown[16-23]"]
+        CL1["Cache Line 1<br/>Cooldown 0-7"]
+        CL2["Cache Line 2<br/>Cooldown 8-15"]
+        CL3["Cache Line 3<br/>Cooldown 16-23"]
     end
     
-    subgraph "RAM (NativeArray&lt;Cooldown&gt;)"
+    subgraph "RAM (NativeArray of Cooldown)"
         direction LR
-        C0["C[0]<br/>8 bytes"] --> C1["C[1]"]
-        C1 --> C2["C[2]"]
-        C2 --> C3["C[3]"]
-        C3 --> C4["C[4]"]
-        C4 --> C5["C[5]"]
-        C5 --> C6["C[6]"]
-        C6 --> C7["C[7]"]
-        C7 --> C8["C[8]"]
+        C0["C0<br/>8 bytes"] --> C1["C1"]
+        C1 --> C2["C2"]
+        C2 --> C3["C3"]
+        C3 --> C4["C4"]
+        C4 --> C5["C5"]
+        C5 --> C6["C6"]
+        C6 --> C7["C7"]
+        C7 --> C8["C8"]
         C8 --> C9["..."]
     end
     
     C0 -.->|Single fetch loads 8 structs| CL1
     C8 -.->|Next fetch| CL2
     
-    CPU["CPU Core"] -->|Reads C[0]| CL1
-    CPU -->|C[1] already cached!| CL1
-    CPU -->|C[2] already cached!| CL1
-    CPU -->|C[7] already cached!| CL1
+    CPU["CPU Core"] -->|Reads C0| CL1
+    CPU -->|C1 already cached| CL1
+    CPU -->|C2 already cached| CL1
+    CPU -->|C7 already cached| CL1
     
     style CL1 fill:#1dd1a1
     style CL2 fill:#1dd1a1
@@ -764,14 +764,14 @@ graph TD
 graph LR
     subgraph "64-Byte Cache Line"
         direction TB
-        B0["Byte 0-7<br/>Cooldown[0]<br/>Current: 4 bytes<br/>Max: 4 bytes"]
-        B1["Byte 8-15<br/>Cooldown[1]"]
-        B2["Byte 16-23<br/>Cooldown[2]"]
-        B3["Byte 24-31<br/>Cooldown[3]"]
-        B4["Byte 32-39<br/>Cooldown[4]"]
-        B5["Byte 40-47<br/>Cooldown[5]"]
-        B6["Byte 48-55<br/>Cooldown[6]"]
-        B7["Byte 56-63<br/>Cooldown[7]"]
+        B0["Byte 0-7<br/>Cooldown 0<br/>Current: 4 bytes<br/>Max: 4 bytes"]
+        B1["Byte 8-15<br/>Cooldown 1"]
+        B2["Byte 16-23<br/>Cooldown 2"]
+        B3["Byte 24-31<br/>Cooldown 3"]
+        B4["Byte 32-39<br/>Cooldown 4"]
+        B5["Byte 40-47<br/>Cooldown 5"]
+        B6["Byte 48-55<br/>Cooldown 6"]
+        B7["Byte 56-63<br/>Cooldown 7"]
     end
     
     style B0 fill:#26de81
